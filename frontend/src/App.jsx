@@ -1,4 +1,5 @@
 import { Route, Routes } from 'react-router-dom'
+import Footer from './components/Footer'
 import Navbar from './components/Navbar'
 import About from './pages/About'
 import Appoinment from './pages/Appoinment'
@@ -22,6 +23,8 @@ export default function App() {
       <Route path='/appoinment/:docId' element={< Appoinment />} />
 
        </Routes>
+
+       <Footer />
     </h1>
   )
 }
