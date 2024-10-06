@@ -5,19 +5,85 @@ import { AppContext } from '../context/AppContext'
 const Appoinment = () => {
 const {docId} = useParams()
 const {doctors,currencySymbol} = useContext(AppContext)
+const daysOfWeek = ['SUN','MON','TUE','WED','THU','FRI','SAT']
+
 //find particular doctor from this array
 
 const [docInfo,setDocInfo] = useState(null)
 
+const [docSlots,setDocSlots] = useState([])
+const [slotIndex,setSlotIndex] = useState(0)
+const [slotTime,setSlotTime] = useState('')
+
 const fetchDocInfo = async () =>{
   const docInfo = doctors.find(doc => doc._id === docId)
 setDocInfo(docInfo)
-console.log(docInfo)
+ 
+}
+
+const getAvailableSlots = async () => {
+setDocSlots([])
+
+//getting current date
+let today = new Date()
+
+for(let i = 0;i<7;i++){
+  //getting date with index
+  let currentDate = new Date(today)
+  currentDate.setDate(today.getDate() + i)
+
+//setting end time of date with index
+let endTime = new Date();
+endTime.setDate(today.getDate()+1)
+endTime.setHours(21,0,0,0)
+
+
+//setting hours
+if(today.getDate() === currentDate.getDate()){
+  currentDate.setHours(currentDate.getHours() > 10 ? currentDate.getHours() + 1 : 10)
+}
+else {
+  currentDate.setHours(10)
+  currentDate.setMinutes(0)
+}
+
+let timeSlots = []
+while(currentDate < endTime) {
+  let formattedTime = currentDate.toLocaleTimeString([],
+{hour:'2-digit', minute: '2-digit'}
+  )
+
+  //add slot to array
+timeSlots.push({
+  dateTime: new Date(currentDate),
+  time: formattedTime
+})
+// Increment current time by 30 minitue
+currentDate.setMinutes(currentDate.getMinutes() + 30)
+
+}
+  //save time slot
+  setDocSlots(prev => ([...prev,timeSlots]))
+// how slot data can be structured
+
+}
 }
 
 useEffect(()=>{
   fetchDocInfo()
 }, [doctors,docId])
+
+useEffect(()=>{
+getAvailableSlots
+},[docInfo])
+
+
+// how slot data can be structured
+
+useEffect(()=>{
+  
+}, [docSlots])
+
   return docInfo && (
     <div> 
 {/* ... Doctors Details */}
@@ -50,6 +116,31 @@ useEffect(()=>{
 
 </div>
 </div>
+{/*-------Booking slots --------*/}
+
+<div className='sm:ml-72 sm:pl-4 mt-4 font-medium text-gray-700 '>
+<p>Booking Slots</p>
+<div>
+{
+  docSlots.length && docSlots.map((item,index) =>(
+    <div key={index}>
+<p>{item[0] && daysOfWeek[item[0].dateTime.getDay()]}</p>
+<p>{item[0] && item[0].dateTime.getDate()}</p>
+
+    </div>
+  ))
+}
+
+</div>
+
+
+
+
+
+</div>
+
+
+
     </div>
   )
 }
