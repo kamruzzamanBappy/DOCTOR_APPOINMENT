@@ -4,7 +4,7 @@ import { assets } from '../assets/assets'
 import { AppContext } from '../context/AppContext'
 const Appoinment = () => {
 const {docId} = useParams()
-const {doctors,currencySymbol} = useContext(AppContext)
+const {doctors, currencySymbol} = useContext(AppContext)
 const daysOfWeek = ['SUN','MON','TUE','WED','THU','FRI','SAT']
 
 //find particular doctor from this array
@@ -17,7 +17,7 @@ const [slotTime,setSlotTime] = useState('')
 
 const fetchDocInfo = async () =>{
   const docInfo = doctors.find(doc => doc._id === docId)
-setDocInfo(docInfo)
+   setDocInfo(docInfo)
  
 }
 
@@ -27,20 +27,21 @@ setDocSlots([])
 //getting current date
 let today = new Date()
 
-for(let i = 0;i<7;i++){
+for(let i = 0; i< 7;i++){
   //getting date with index
   let currentDate = new Date(today)
-  currentDate.setDate(today.getDate() + i)
+  currentDate.setDate(today.getDate()+ i)
 
 //setting end time of date with index
 let endTime = new Date();
-endTime.setDate(today.getDate()+1)
+endTime.setDate(today.getDate()+ i)
 endTime.setHours(21,0,0,0)
-
 
 //setting hours
 if(today.getDate() === currentDate.getDate()){
   currentDate.setHours(currentDate.getHours() > 10 ? currentDate.getHours() + 1 : 10)
+currentDate.setMinutes(currentDate.getMinutes() > 30 ? 30:0)
+
 }
 else {
   currentDate.setHours(10)
@@ -50,7 +51,7 @@ else {
 let timeSlots = []
 while(currentDate < endTime) {
   let formattedTime = currentDate.toLocaleTimeString([],
-{hour:'2-digit', minute: '2-digit'}
+{ hour:'2-digit', minute: '2-digit'}
   )
 
   //add slot to array
@@ -70,18 +71,18 @@ currentDate.setMinutes(currentDate.getMinutes() + 30)
 }
 
 useEffect(()=>{
-  fetchDocInfo()
+  fetchDocInfo();
 }, [doctors,docId])
 
 useEffect(()=>{
-getAvailableSlots
+getAvailableSlots()
 },[docInfo])
 
 
 // how slot data can be structured
 
 useEffect(()=>{
-  
+  console.log(docSlots)
 }, [docSlots])
 
   return docInfo && (
@@ -118,12 +119,12 @@ useEffect(()=>{
 </div>
 {/*-------Booking slots --------*/}
 
-<div className='sm:ml-72 sm:pl-4 mt-4 font-medium text-gray-700 '>
+<div className='sm:ml-72 sm:pl-4 mt-4 font-medium text-gray-700'>
 <p>Booking Slots</p>
-<div>
+<div className='flex gap-3 items-center w-full overflow-x-scroll mt-4'>
 {
   docSlots.length && docSlots.map((item,index) =>(
-    <div key={index}>
+<div onClick={()=>setSlotIndex(index)} className={`text-center py-6 min-w-16 rounded-full cursor-pointer ${slotIndex === index ? 'bg-primary text-white' : 'border border-gray-300' }`} key={index}>
 <p>{item[0] && daysOfWeek[item[0].dateTime.getDay()]}</p>
 <p>{item[0] && item[0].dateTime.getDate()}</p>
 
@@ -133,9 +134,14 @@ useEffect(()=>{
 
 </div>
 
+<div>
+{docSlots.length && docSlots[slotIndex].map((item,index) =>{
+  <p className={`text-sm font-light flex-shrink-0 px-5 py-2 rounded-full cursor-pointer`} key={index}>
+ {item.time.toLowerCase()}
+  </p>
+})}
 
-
-
+</div>
 
 </div>
 
